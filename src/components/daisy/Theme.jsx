@@ -1,4 +1,3 @@
-import { th } from "framer-motion/client";
 import React, { useEffect, useState } from "react";
 
 export default function Theme() {
