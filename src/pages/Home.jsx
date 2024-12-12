@@ -4,7 +4,7 @@ import Hero from "../components/home/Hero";
 import ListProduct from "../components/home/ListProduct";
 import WhyChoose from "../components/home/WhyChoose";
 import SupportPayment from "../components/home/SupportPayments";
-import CTA from "../components/home/Cta";
+import CTA from "../components/home/CTA";
 import Footer from "../components/tailus/Footer";
 
 const Home = () => {
