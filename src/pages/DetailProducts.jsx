@@ -65,13 +65,47 @@ const DetailProducts = () => {
 
           {/* Informasi Produk */}
           <div className="p-4 w-full md:w-1/2">
+            {/* Nama Barang */}
             <h2 className="text-2xl font-bold">{product.item_name}</h2>
+
+            {/* Deskripsi */}
             <p className="text-sm mt-2">{product.description}</p>
+
+            {/* Jenis Barang */}
+            <p className="text-sm mt-2 font-medium text-gray-700 dark:text-gray-300">
+              Jenis:{" "}
+              <span className="font-semibold text-gray-900 dark:text-gray-100">
+                {product.item_type}
+              </span>
+            </p>
+
+            {/* Stok Barang */}
+            <p className="text-sm mt-2 font-medium text-gray-700 dark:text-gray-300">
+              Stok:{" "}
+              <span
+                className={`font-semibold ${
+                  product.item_stock > 0
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-red-600 dark:text-red-400"
+                }`}
+              >
+                {product.item_stock > 0
+                  ? `${product.item_stock} tersedia`
+                  : "Habis"}
+              </span>
+            </p>
+
+            {/* Harga */}
             <p className="text-xl font-semibold mt-4 text-purple-600 dark:text-purple-400">
               {formatRupiah(product.item_price)}
             </p>
-            <button className="bg-blue-300 text-black hover:bg-blue-400 px-4 py-2 rounded mt-6">
-              Add to Cart
+
+            {/* Tombol Tambah ke Keranjang */}
+            <button
+              className="bg-blue-300 text-black hover:bg-blue-400 px-4 py-2 rounded mt-6"
+              disabled={product.item_stock === 0}
+            >
+              {product.item_stock > 0 ? "Add to Cart" : "Out of Stock"}
             </button>
           </div>
         </div>
