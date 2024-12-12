@@ -45,14 +45,6 @@ const DetailProducts = () => {
 
       {/* Konten */}
       <main className="container mx-auto p-4 flex-grow">
-        {/* Tombol Kembali */}
-        <button
-          onClick={() => navigate(-1)}
-          className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded mb-4"
-        >
-          ← Back
-        </button>
-
         <div className="flex flex-col md:flex-row bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
           {/* Gambar Produk */}
           <div className="w-full md:w-1/2 h-64 md:h-auto">
@@ -66,22 +58,22 @@ const DetailProducts = () => {
           {/* Informasi Produk */}
           <div className="p-4 w-full md:w-1/2">
             {/* Nama Barang */}
-            <h2 className="text-2xl font-bold">{product.item_name}</h2>
+            <h2 className="text-3xl font-bold">{product.item_name}</h2>
 
             {/* Deskripsi */}
-            <p className="text-sm mt-2">{product.description}</p>
+            <p className="text-lg mt-2">{product.description}</p>
 
             {/* Jenis Barang */}
-            <p className="text-sm mt-2 font-medium text-gray-700 dark:text-gray-300">
-              Jenis:{" "}
+            <p className="text-lg mt-2 font-medium text-gray-700 dark:text-gray-300">
+              Type:{" "}
               <span className="font-semibold text-gray-900 dark:text-gray-100">
                 {product.item_type}
               </span>
             </p>
 
             {/* Stok Barang */}
-            <p className="text-sm mt-2 font-medium text-gray-700 dark:text-gray-300">
-              Stok:{" "}
+            <p className="text-lg mt-2 font-medium text-gray-700 dark:text-gray-300">
+              Stock:{" "}
               <span
                 className={`font-semibold ${
                   product.item_stock > 0
@@ -90,8 +82,8 @@ const DetailProducts = () => {
                 }`}
               >
                 {product.item_stock > 0
-                  ? `${product.item_stock} tersedia`
-                  : "Habis"}
+                  ? `${product.item_stock} Available`
+                  : "Out of Stock"}
               </span>
             </p>
 
@@ -100,13 +92,22 @@ const DetailProducts = () => {
               {formatRupiah(product.item_price)}
             </p>
 
-            {/* Tombol Tambah ke Keranjang */}
-            <button
-              className="bg-blue-300 text-black hover:bg-blue-400 px-4 py-2 rounded mt-6"
-              disabled={product.item_stock === 0}
-            >
-              {product.item_stock > 0 ? "Add to Cart" : "Out of Stock"}
-            </button>
+            {/* Tombol Tambah ke Keranjang + Back */}
+            <div className="flex flex-col">
+              <button
+                className="bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 rounded mt-6"
+                disabled={product.item_stock === 0}
+              >
+                {product.item_stock > 0 ? "Add to Cart" : "Out of Stock"}
+              </button>
+
+              <button
+                onClick={() => navigate(-1)}
+                className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded mt-4"
+              >
+                ← Back
+              </button>
+            </div>
           </div>
         </div>
       </main>
