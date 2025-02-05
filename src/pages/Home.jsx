@@ -6,6 +6,7 @@ import WhyChoose from "../components/home/WhyChoose";
 import SupportPayment from "../components/home/SupportPayments";
 import CTA from "../components/home/CTA";
 import Footer from "../components/tailus/Footer";
+import FloatBtn from "../components/FloatBtn";
 
 const Home = () => {
   return (
@@ -17,6 +18,7 @@ const Home = () => {
         <WhyChoose />
         <SupportPayment />
         <CTA />
+        <FloatBtn />
       </div>
       <Footer />
     </>

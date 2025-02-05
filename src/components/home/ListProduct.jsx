@@ -34,10 +34,10 @@ const ListProduct = () => {
         {product.slice(0, visibleCount).map((item) => (
           <Card
             key={item.id}
-            id={item.id}
+            idProduct={item.id}
             title={item.item_name}
             image={item.image_item}
-            price={item.item_price}
+            price={item.price}
             description={item.description}
           />
         ))}

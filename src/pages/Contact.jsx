@@ -1,11 +1,13 @@
 import React from "react";
 import Header from "../components/tailus/Header";
 import Footer from "../components/tailus/Footer";
+import FloatBtn from "../components/FloatBtn";
 
 const Contact = () => {
   return (
     <div className="bg-blue-50 text-blue-900 dark:bg-blue-900 dark:text-blue-100 min-h-screen">
       <Header />
+      <FloatBtn />
       <section className="relative bg-blue-200 dark:bg-blue-800 py-16">
         <div className="container mx-auto px-6 flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 space-y-6 text-center md:text-left">

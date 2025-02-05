@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Card from "../daisy/Card";
 import truncateText from "../hooks/useTruncateText";
 
-const AllProducts = ({ products = [] }) => {
+const AllProducts = ({ products, searchProduct, setSearchProduct = [] }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8; // Jumlah produk per halaman
@@ -43,6 +43,7 @@ const AllProducts = ({ products = [] }) => {
           onChange={(e) => {
             setSearchTerm(e.target.value);
             setCurrentPage(1); // Reset ke halaman 1 saat pencarian
+            setSearchProduct(e.target.value);
           }}
         />
       </div>
@@ -53,10 +54,10 @@ const AllProducts = ({ products = [] }) => {
           currentProducts.map((item) => (
             <div key={item.id} className="rounded-lg bg-white shadow">
               <Card
-                id={item.id}
+                idProduct={item.id}
                 title={item.item_name}
                 image={item.image_item}
-                price={item.item_price}
+                price={item.price}
                 type={item.item_type}
                 description={truncateText(item.description)}
               />

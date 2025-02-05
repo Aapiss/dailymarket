@@ -1,11 +1,13 @@
 import React from "react";
 import Footer from "../components/tailus/Footer";
 import Header from "../components/tailus/Header";
+import FloatBtn from "../components/FloatBtn";
 
 const About = () => {
   return (
     <div>
       <Header />
+      <FloatBtn />
       {/* Hero Section */}
       <section className="relative bg-blue-200">
         <div className="container mx-auto px-6 py-16 flex flex-col md:flex-row items-center">

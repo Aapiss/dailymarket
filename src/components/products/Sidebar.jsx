@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 const Sidebar = ({ setShortBy, setCategory, setShortByClient }) => {
   const [selectedFilter, setSelectedFilter] = useState("");
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [sortOrder, setSortOrder] = useState("");
+
+  const [selectParams, setSelectParams] = useSearchParams();
 
   const handleFilterChange = (filter) => {
     setSelectedFilter(filter);
@@ -25,8 +28,15 @@ const Sidebar = ({ setShortBy, setCategory, setShortByClient }) => {
       : [...selectedCategory, category];
 
     setSelectedCategory(updateCategory);
+    setSelectParams({ category: updateCategory });
     setCategory(updateCategory);
   };
+
+  useEffect(() => {
+    const categoryParams = selectParams.getAll("category");
+    setSelectedCategory(categoryParams);
+    setCategory(categoryParams);
+  }, [selectParams]);
 
   return (
     <aside className="w-full md:w-1/5 p-4 md:p-6 rounded-lg shadow-md bg-gray-50 dark:bg-gray-800">
