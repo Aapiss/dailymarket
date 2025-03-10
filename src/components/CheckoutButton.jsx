@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
-import useCart from "../utils/store/usecart";
+import useCartStore from "../utils/store/usecart";
 import { supabase } from "../utils/SupaClient";
 
 const formatHarga = (harga) => {
@@ -13,7 +13,7 @@ const formatHarga = (harga) => {
 
 const CheckoutButton = ({ cart, totalHarga, navigate }) => {
   const [isProcessing, setIsProcessing] = useState(false);
-  const clearCart = useCart.getState().clearCart;
+  const clearCart = useCartStore.getState().clearCart;
 
   const confirmCheckout = () => {
     if (cart.length === 0) {

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { supabase } from "../SupaClient";
 
-const useCart = create((set, get) => ({
+const useCartStore = create((set, get) => ({
   cart: [],
   cartCount: 0,
 
@@ -60,4 +60,4 @@ const useCart = create((set, get) => ({
   },
 }));
 
-export default useCart;
+export default useCartStore;
