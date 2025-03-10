@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useCart from "../utils/store/usecart";
 import Header from "../components/tailus/Header";
 import Swal from "sweetalert2";
 import { supabase } from "../utils/SupaClient.js";
 import { Helmet } from "react-helmet-async";
+import useCart from "../utils/store/usecart";
 
 export default function ProductPage() {
   const navigate = useNavigate();
