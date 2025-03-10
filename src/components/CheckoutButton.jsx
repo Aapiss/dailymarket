@@ -105,15 +105,18 @@ const CheckoutButton = ({ cart, totalHarga, navigate }) => {
 
     console.log(customerDetails);
 
-    const response = await fetch("http://localhost:5000/api/payment/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        transactionDetails,
-        customerDetails,
-        itemDetails,
-      }),
-    });
+    const response = await fetch(
+      "https://midtrans-lac.vercel.app/api/payment/checkout",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          transactionDetails,
+          customerDetails,
+          itemDetails,
+        }),
+      }
+    );
 
     const { token } = await response.json();
 
@@ -122,7 +125,7 @@ const CheckoutButton = ({ cart, totalHarga, navigate }) => {
         const paymentChannel =
           midtransResponse.payment_type || "Tidak Diketahui";
 
-        const { error: riwayatError } = await supabase.from("history").insert(
+        const { error: riwayatError } = await supabase.from("riwayat").insert(
           cart.map((item) => ({
             profile_id: user.user.id,
             barang_id: item.barang_id,
