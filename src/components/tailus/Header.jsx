@@ -1,154 +1,231 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import Swal from "sweetalert2";
+import {
+  FaShoppingCart,
+  FaSignOutAlt,
+  FaUser,
+  FaBars,
+  FaTimes,
+  FaHistory,
+} from "react-icons/fa";
+import { supabase } from "../../utils/SupaClient";
 import Theme from "../daisy/Theme";
-import { useAuth } from "../../utils/store/useAuth";
-import { useCart } from "../../utils/store/useCart";
 
-export default function Header() {
+const Header = () => {
+  const [userProfile, setUserProfile] = useState(null);
+  const [profileData, setProfileData] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [cartCount, setCartCount] = useState(0);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth(); // Ambil status login dari useAuth
-  const { getTotalUniqueItems } = useCart();
-  const totalUniqueItems = getTotalUniqueItems();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: user } = await supabase.auth.getUser();
+      setUserProfile(user || null);
+      setIsLoading(false);
+    };
+
+    fetchUser();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUserProfile(session?.user || null);
+        setProfileData(null);
+        setIsLoading(false);
+      }
+    );
+
+    return () => authListener?.subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (userProfile && !profileData) {
+      const fetchProfile = async () => {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("full_name, avatar_url")
+          .eq("id", userProfile.id)
+          .single();
+
+        if (!error) setProfileData(data);
+      };
+
+      fetchProfile();
+    }
+  }, [userProfile, profileData]);
+
+  useEffect(() => {
+    if (userProfile) {
+      const fetchCartCount = async () => {
+        const { data, error } = await supabase
+          .from("keranjang")
+          .select("quantity")
+          .eq("profile_id", userProfile.id);
+
+        if (!error) {
+          const totalQuantity = data.reduce(
+            (total, item) => total + item.quantity,
+            0
+          );
+          setCartCount(totalQuantity);
+        }
+      };
+      fetchCartCount();
+    }
+  }, [userProfile]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setUserProfile(null);
+    setProfileData(null);
+    setDropdownOpen(false);
+
+    Swal.fire({
+      icon: "success",
+      title: "Logged out successfully!",
+      showConfirmButton: false,
+      timer: 1500,
+    });
+
+    navigate("/");
+  };
+
+  const handleMenuClick = () => {
+    setIsMenuOpen(false); // Close the menu on link click in mobile view
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
-    <>
-      <header>
-        <input
-          type="checkbox"
-          name="hbr"
-          id="hbr"
-          className="hbr peer"
-          hidden
-          aria-hidden="true"
-        />
-        <nav className="fixed z-20 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur navbar shadow-md shadow-gray-600/5 peer-checked:navbar-active md:relative md:bg-transparent dark:shadow-none">
-          <div className="xl:container m-auto px-6 md:px-12 w-full">
-            <div className="w-full flex flex-wrap items-center justify-between gap-6 md:py-3 md:gap-0">
-              <div className="w-full flex justify-between lg:w-auto">
-                <a
-                  href="#"
-                  aria-label="logo"
-                  className="flex space-x-2 items-center"
-                >
-                  <span className="text-base font-bold text-gray-600 dark:text-white">
-                    DailyMarket
-                  </span>
-                </a>
-                <label
-                  htmlFor="hbr"
-                  className="peer-checked:hamburger block relative z-20 p-6 -mr-6 cursor-pointer lg:hidden ml-auto"
-                >
-                  <div
-                    aria-hidden="true"
-                    className="m-auto h-0.5 w-6 rounded bg-gray-900 dark:bg-gray-300 transition duration-300"
-                  ></div>
-                  <div
-                    aria-hidden="true"
-                    className="m-auto mt-2 h-0.5 w-6 rounded bg-gray-900 dark:bg-gray-300 transition duration-300"
-                  ></div>
-                </label>
-              </div>
-              <div className="navmenu hidden w-full flex-wrap justify-end items-center mb-16 space-y-8 p-6 border border-gray-100 rounded-3xl shadow-2xl shadow-gray-300/20 bg-white dark:bg-gray-800 lg:space-y-0 lg:p-0 lg:m-0 lg:flex md:flex-nowrap lg:bg-transparent lg:w-7/12 lg:shadow-none dark:shadow-none lg:border-0">
-                <div className="text-gray-600 dark:text-gray-300 lg:pr-4">
-                  <ul className="space-y-6 tracking-wide font-medium text-lg lg:flex lg:space-y-0">
-                    <li>
-                      <Link
-                        to={"/"}
-                        className={`${
-                          location.pathname === "/" ? "text-blue-400" : ""
-                        } block md:px-4 transition dark:hover:text-primaryLight`}
-                      >
-                        <span>Home</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to={"/about"}
-                        className={`${
-                          location.pathname === "/about" ? "text-blue-400" : ""
-                        } block md:px-4 transition dark:hover:text-primaryLight`}
-                      >
-                        <span>About</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to={"/product"}
-                        className={`${
-                          location.pathname === "/product"
-                            ? "text-blue-400"
-                            : ""
-                        } block md:px-4 transition dark:hover:text-primaryLight`}
-                      >
-                        <span>Product</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to={"/contact"}
-                        className={`${
-                          location.pathname === "/contact"
-                            ? "text-blue-400"
-                            : ""
-                        } block md:px-4 transition dark:hover:text-primaryLight`}
-                      >
-                        <span>Contact</span>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
+    <header>
+      <nav className="fixed top-0 left-0 w-full bg-blue-100/80 dark:bg-blue-900/80 backdrop-blur-md shadow-md z-50">
+        <div className="px-4 md:px-8 flex justify-between items-center py-3">
+          {/* Logo */}
+          <Link
+            to="/"
+            className="text-xl font-semibold text-blue-700 dark:text-white hover:text-blue-500 transition duration-300"
+          >
+            DailyMarket
+          </Link>
 
-                <div className="w-full space-y-2 border-primary/10 dark:border-gray-700 flex flex-col -ml-1 sm:flex-row lg:space-y-0 md:w-max lg:border-l gap-6">
-                  {user ? (
-                    <>
-                      <Link
-                        to={"/cart"}
-                        className="relative flex h-9 items-center justify-center sm:px-4 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="30"
-                          height="30"
-                          viewBox="0 0 512 496"
+          {/* Hamburger Button */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden text-blue-700 dark:text-white"
+          >
+            {isMenuOpen ? (
+              <FaTimes className="w-6 h-6" />
+            ) : (
+              <FaBars className="w-6 h-6" />
+            )}
+          </button>
+
+          <ul className="hidden md:flex space-x-8">
+            {["Home", "About", "Product", "Contact"].map((menu, i) => {
+              const path = menu === "Home" ? "/" : `/${menu.toLowerCase()}`;
+              return (
+                <li key={i}>
+                  <Link
+                    to={path}
+                    className={`${
+                      location.pathname === path
+                        ? "text-blue-500"
+                        : "text-blue-700 dark:text-white"
+                    } hover:text-blue-500 transition duration-300`}
+                  >
+                    {menu}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+
+          {/* User & Cart Icons */}
+          <div className="hidden md:flex items-center space-x-4">
+            {userProfile ? (
+              <div className="relative">
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="flex items-center space-x-2"
+                >
+                  <img
+                    src={profileData?.avatar_url || "/default-avatar.png"}
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full border border-blue-300 dark:border-blue-700"
+                  />
+                </button>
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-blue-800 rounded-xl shadow-xl z-10">
+                    <ul className="divide-y divide-blue-100 dark:divide-blue-700">
+                      <li>
+                        <Link
+                          to="/profile"
+                          className="flex items-center px-4 py-3 hover:bg-blue-100 dark:hover:bg-blue-700"
                         >
-                          <path
-                            fill="currentColor"
-                            d="M448 69H137l-3-12q-5-23-22.5-37.5T70 5H21q-9 0-15 6T0 27q0 9 6 15t15 6h49q19 0 22 17l49 256q6 21 23.5 34t38.5 13h202q10 0 16-6t6-15q0-22-22-22H203q-14 0-20-12l-2-9h214q20 0 36.5-12t22.5-31l58-123v-5q0-27-18.5-45.5T448 69zm-32 175v2q-3 15-21 15H173l-28-149h303q18 0 21 17zM256 432q0 18-12.5 30.5T213 475q-17 0-29.5-12.5T171 432t12.5-30.5T213 389q18 0 30.5 12.5T256 432zm171 0q0 18-12.5 30.5T384 475t-30.5-12.5T341 432t12.5-30.5T384 389t30.5 12.5T427 432z"
-                          />
-                        </svg>
-
-                        {totalUniqueItems > 0 && (
-                          <span className="absolute top-0 right-0 -mt-1 -mr-1 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                            {totalUniqueItems}
-                          </span>
-                        )}
-                      </Link>
-                      <Link
-                        to={"/profile"}
-                        className="relative flex h-9 ml-5 items-center justify-center sm:px-6 before:absolute before:inset-0 before:rounded-full before:bg-blue-400 dark:before:bg-primaryLight before:transition before:duration-300 hover:before:scale-105 active:duration-75 active:before:scale-95"
-                      >
-                        <span className="relative text-sm font-semibold text-white dark:text-gray-900">
+                          <FaUser className="w-5 h-5 mr-3" />
                           Profile
-                        </span>
-                      </Link>
-                    </>
-                  ) : (
-                    <Link
-                      to={"/login"}
-                      className="relative flex h-9 ml-5 items-center justify-center sm:px-6 before:absolute before:inset-0 before:rounded-full before:bg-blue-400 dark:before:bg-primaryLight before:transition before:duration-300 hover:before:scale-105 active:duration-75 active:before:scale-95"
-                    >
-                      <span className="relative text-sm font-semibold text-white dark:text-gray-900">
-                        Login
-                      </span>
-                    </Link>
-                  )}
-                  <Theme />
-                </div>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/history"
+                          className="flex items-center px-4 py-3 hover:bg-blue-100 dark:hover:bg-blue-700"
+                        >
+                          <FaHistory className="w-5 h-5 mr-3" />
+                          History
+                        </Link>
+                      </li>
+                      <li>
+                        <button
+                          onClick={handleLogout}
+                          className="flex items-center px-4 py-3 text-red-600 w-full hover:bg-red-100 dark:hover:bg-red-700"
+                        >
+                          <FaSignOutAlt className="w-5 h-5 mr-3" />
+                          Logout
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                )}
               </div>
-            </div>
+            ) : (
+              <button
+                onClick={() => navigate("/login")}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              >
+                Login
+              </button>
+            )}
+
+            <Link
+              to="/cart"
+              className="relative text-blue-700 dark:text-white hover:text-blue-500"
+            >
+              <FaShoppingCart className="w-5 h-5" />
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+
+            <Theme />
           </div>
-        </nav>
-      </header>
-    </>
+        </div>
+      </nav>
+    </header>
   );
-}
+};
+
+export default Header;

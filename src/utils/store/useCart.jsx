@@ -1,70 +1,63 @@
 import { create } from "zustand";
 import { supabase } from "../SupaClient";
 
-export const useCart = create((set, get) => ({
+const useCart = create((set, get) => ({
   cart: [],
+  cartCount: 0,
 
   fetchCart: async () => {
-    const { data, error } = await supabase
-      .from("cart")
-      .select("*, item(image_item)");
+    const { data: user } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data: cartData, error } = await supabase
+      .from("keranjang")
+      .select("barang_id, quantity")
+      .eq("profile_id", user.user.id);
 
     if (!error) {
-      set({ cart: data });
+      const totalItems = cartData.reduce((acc, item) => acc + item.quantity, 0);
+      set({ cart: cartData, cartCount: totalItems });
     }
   },
 
-  addToCart: async (item) => {
-    const { cart, fetchCart } = get();
-    const existingItem = cart.find((i) => i.id_product === item.id_product);
+  addToCart: async (productId) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      // Jika pengguna belum login, kembalikan peringatan
+      return { success: false, message: "Please login first!" };
+    }
 
-    if (existingItem) {
-      const updateItem = {
-        ...existingItem,
-        amount: existingItem.amount + 1,
-        price: (existingItem.amount + 1) * item.price,
-      };
+    console.log(user);
 
-      const { error } = await supabase
-        .from("cart")
-        .update({
-          amount: updateItem.amount,
-          price: updateItem.price,
-        })
-        .eq("id", existingItem.id);
+    const { data: cartItem, error } = await supabase
+      .from("keranjang")
+      .select("*")
+      .eq("profile_id", user.id)
+      .eq("barang_id", productId)
+      .single();
 
-      if (!error) {
-        set((state) => ({
-          cart: state.cart.map((cartItem) =>
-            cartItem.id === existingItem.id ? updateItem : cartItem
-          ),
-        }));
-      }
+    if (cartItem) {
+      await supabase
+        .from("keranjang")
+        .update({ quantity: cartItem.quantity + 1 })
+        .eq("profile_id", user.id)
+        .eq("barang_id", productId);
     } else {
-      const { error } = await supabase
-        .from("cart")
-        .insert([item], { returning: "minimal" });
-
-      if (!error) {
-        await fetchCart(); // Panggil fetchCart agar state diperbarui dengan data terbaru
-      }
+      await supabase.from("keranjang").insert([
+        {
+          profile_id: user.id,
+          barang_id: productId,
+          quantity: 1,
+        },
+      ]);
     }
-  },
 
-  removeFromCart: async (idProduct) => {
-    const { error } = await supabase
-      .from("cart")
-      .delete()
-      .eq("id_product", idProduct);
-
-    if (!error) {
-      set((state) => ({
-        cart: state.cart.filter((item) => item.id_product !== idProduct),
-      }));
-    }
-  },
-
-  getTotalUniqueItems: () => {
-    return new Set(get().cart.map((item) => item.id_product)).size;
+    // Ambil ulang cart setelah menambah produk
+    await get().fetchCart();
+    return { success: true };
   },
 }));
+
+export default useCart;

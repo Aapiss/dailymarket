@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../utils/SupaClient";
 import useFormatRupiah from "../components/hooks/useFormatRupiah";
-import Header from "../components/tailus/Header";
 import Footer from "../components/tailus/Footer";
 
 const DetailProducts = () => {
