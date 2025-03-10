@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useCartStore from "../utils/store/usecart";
+import useCart from "../utils/store/usecart";
 import Header from "../components/tailus/Header";
 import Swal from "sweetalert2";
 import { supabase } from "../utils/SupaClient.js";
@@ -8,7 +8,7 @@ import { Helmet } from "react-helmet-async";
 
 export default function ProductPage() {
   const navigate = useNavigate();
-  const { cartCount, fetchCart, addToCart } = useCartStore();
+  const { cartCount, fetchCart, addToCart } = useCart();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
