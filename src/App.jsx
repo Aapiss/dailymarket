@@ -29,7 +29,7 @@ const App = () => {
           <Route path="/signup" element={<RegisterPage />} />
         </Route>
         <Route element={<AuthRoute />}>
-          {/* <Route path="/profile" element={<Profile />} /> */}
+          <Route path="/profile" element={<Profile />} />
         </Route>
         <Route path="/history" element={<HistoryPayment />} />
       </Routes>
